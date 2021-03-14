@@ -1,9 +1,12 @@
 package com.example.conduit
 
 import com.example.api.ConduitClient
+import com.example.api.models.entities.UserCreds
+import com.example.api.models.requests.SignupRequest
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.*
 import org.junit.Test
+import kotlin.random.Random
 
 class ConduitClientTests {
     private var conduitClient = ConduitClient()
@@ -13,8 +16,6 @@ class ConduitClientTests {
             val articles =  conduitClient.api.getArticles()
             assertNotNull(articles.body()?.articles)
         }
-//       val articles =  conduitClient.api.getArticles().execute()
-//        assertNotNull(articles.body()?.articles)
     }
 
     @Test
@@ -30,6 +31,19 @@ class ConduitClientTests {
         runBlocking {
             val articles =  conduitClient.api.getArticles(tags = listOf("dragons","butts"))
             assertNotNull(articles.body()?.articles)
+        }
+    }
+
+    @Test
+    fun `POST users - create user`(){
+        val userCreds = UserCreds(
+            email = "testemali${Random.nextInt(999,9999) }@test.com",
+            password = "password${Random.nextInt(999,9999)}",
+            username =  "User${Random.nextInt(100,1000)}"
+        )
+        runBlocking {
+            val response = conduitClient.api.signUpUser(SignupRequest(userCreds) )
+            assertEquals(userCreds.username ,response.body()?.user?.username)
         }
     }
 }
